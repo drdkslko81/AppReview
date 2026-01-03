@@ -4900,56 +4900,6 @@ with main_container:
 
 # img_str = base64.b64encode(buffered.getvalue()).decode()
 
- 
-
-st.markdown(f"""
-
-    <style>
-
- 
-
-    .fixed-bottom-right {{
-
-        position: fixed;
-
-        right: 0;
-
-        bottom: 0;
-
-        margin: 20px;
-
-        z-index: 1000;
-
-        text-align: right;
-
-    }}
-
-    .bottom-link {{
-
-        font-size: 14px;
-
-        color: #003366;
-
-        font-weight: bold;
-
-        text-decoration: none;
-
-        background: #fff;
-
-        padding: 6px 12px;
-
-        border-radius: 5px;
-
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-
-    }}
-
- 
-
-    </style>
-
-
-
 
 
 
