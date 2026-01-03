@@ -514,7 +514,7 @@ def show_timed_warning_generic(message, duration=3):
 
  
 
-app_url = https://qwerty.com/
+app_url = 
 
  
 
