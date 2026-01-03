@@ -192,7 +192,7 @@ local_css("custom_style.css")
 
 dir = os.path.dirname(__file__)
 
-filename = os.path.join(dir, 'Images/wufull.png')
+filename = os.path.join(dir, 'wu.png')
 
 with open(filename, "rb") as image_file:
 
