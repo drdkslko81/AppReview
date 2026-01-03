@@ -4948,22 +4948,11 @@ st.markdown(f"""
 
     </style>
 
- 
 
 
 
 
-st.markdown("""
 
-    <div style='text-align: center; margin-top: 5rem; font-size: 0.9rem; color: #666;font-weight: bold;'>
-
-        <em>*Customer Review Data will only be visible when either Language Translation/Reset Button is clicked</em><br>
-
-        <em>*SunBurst and TreeMap are displayed for data upto 3 months</em>
-
-    </div>
-
-# ✅ FIXED FOOTER - Replace the broken st.markdown block at end of main.py
 st.markdown("""
 <div style="text-align: center; margin-top: 5rem; font-size: 0.9rem; color: #666; font-weight: bold;">
     <em>*Customer Review Data will only be visible when either Language Translation/Reset Button is clicked</em><br>
@@ -4971,10 +4960,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ CLICKABLE FEEDBACK BUTTON (bottom-right)
+
 st.markdown("""
 <div style="position: fixed; right: 20px; bottom: 20px; z-index: 1000; text-align: right;">
-    <a href="mailto:?subject=Feedback%20%7C%20Issue%20%7C%20Suggestion" 
+    <a href="mailto:srivastava.jaideep@gmail.com?subject=Feedback%20%7C%20Issue%20%7C%20Suggestion" 
        class="bottom-link" 
        style="font-size: 14px; color: #003366; font-weight: bold; 
               text-decoration: none; background: white; 
