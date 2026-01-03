@@ -17,7 +17,7 @@ vaderSentiment
 scikit-learn==1.7.0
 pyLDAvis==3.2.2
 bertopic==0.17.0
-summarizer==0.0.7
+#summarizer==0.0.7
 langdetect==1.0.9
 streamlit-autorefresh==1.0.1
 pycountry==24.6.1
