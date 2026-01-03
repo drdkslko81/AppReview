@@ -514,37 +514,37 @@ def show_timed_warning_generic(message, duration=3):
 
  
 
-app_url = 
+# app_url = 
 
  
 
-# Generate the QR code
+# # Generate the QR code
 
-qr = qrcode.QRCode(
+# qr = qrcode.QRCode(
 
-    version=1,
+#     version=1,
 
-    box_size=10,
+#     box_size=10,
 
-    border=5
+#     border=5
 
-)
+# )
 
-qr.add_data(app_url)
+# qr.add_data(app_url)
 
-qr.make(fit=True)
-
- 
-
-# Create an image
-
-img = qr.make_image(fill="black", back_color="white")
+# qr.make(fit=True)
 
  
 
-# Save to file
+# # Create an image
 
-img.save("app_qr_code.png")
+# img = qr.make_image(fill="black", back_color="white")
+
+ 
+
+# # Save to file
+
+# img.save("app_qr_code.png")
 
  
 
