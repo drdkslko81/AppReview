@@ -466,21 +466,8 @@ st.markdown("""
 
  
 
-st.markdown("""
-
-    <div style='text-align: center; padding-top: 25px;'>
-
-        <h1 style='color: black; font-weight: bold; font-family: "PP Right Grotesk", sans-serif; font-size: 35px;'>
-
-            Customer Sentiment Analyzer
-
-        </h1>
-
-    </div>
-
-""", unsafe_allow_html=True)
-
- 
+st.markdown("# **Customer Sentiment Analyzer**", unsafe_allow_html=True)
+st.markdown("---")  # Divider 
 
  
 
