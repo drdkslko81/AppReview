@@ -4951,20 +4951,7 @@ st.markdown(f"""
  
 
 
-<style>
-.bottom-link:hover {
-    background: #ffdd00 !important;
-    color: black !important;
-    text-decoration: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
-
-
-""", unsafe_allow_html=True)
-
- 
 
 st.markdown("""
 
