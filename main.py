@@ -118,9 +118,9 @@ from languages import *
 
 warnings.filterwarnings('ignore')
 
-nltk.download('punkt')
+#nltk.download('punkt')
 
-nltk.download('words')
+#nltk.download('words')
 
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -549,6 +549,15 @@ def show_timed_warning_generic(message, duration=3):
  
 
 #count = st_autorefresh(interval=3600000, key="fizzbuzzcounter")
+try:
+    nltk.data.find('sentiment/vader_lexicon.zip')
+except LookupError:
+    nltk.download('vader_lexicon', quiet=True)
+
+import nltk
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+
 
 sia = SentimentIntensityAnalyzer()
 
