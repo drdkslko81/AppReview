@@ -4950,17 +4950,27 @@ st.markdown(f"""
 
  
 
-    <div class="fixed-bottom-right">
+    st.markdown("""
+<div style="position: fixed; right: 20px; bottom: 20px; z-index: 1000; text-align: right;">
+    <a href="mailto:srivastava.jaideep@gmail.com?subject=Feedback%20|%20Issue%20|%20Suggestion" 
+       class="bottom-link" 
+       style="font-size: 14px; color: #003366; font-weight: bold; 
+              text-decoration: none; background: white; 
+              padding: 8px 16px; border-radius: 5px; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        📧 Feedback
+    </a>
+</div>
+<style>
+.bottom-link:hover {
+    background: #ffdd00 !important;
+    color: black !important;
+    text-decoration: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-        <a href=mailto:?subject=Feedback | Issue | Suggestion class="bottom-link">
 
-        Feedback
-
-        </a>
-
- 
-
-    </div>
 
 """, unsafe_allow_html=True)
 
