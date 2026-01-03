@@ -150,15 +150,15 @@ from streamlit_autorefresh import st_autorefresh
 
  
 
-# st.set_page_config(page_title="WU Customer Sentiment Analyzer!!!", page_icon=":sparkles:",layout="wide")
+# st.set_page_config(page_title="Apotheke Customer Sentiment Analyzer!!!", page_icon=":sparkles:",layout="wide")
 
  
 
 st.set_page_config(
 
-    page_title="WU Customer Sentiment Analyzer!!!",
+    page_title="Apotheke Customer Sentiment Analyzer!!!",
 
-    page_icon="Images/WUNEW.png",  # File must be in the root directory
+    page_icon="apotheke.png",  # File must be in the root directory
 
     layout="wide"
 
@@ -192,7 +192,7 @@ local_css("custom_style.css")
 
 dir = os.path.dirname(__file__)
 
-filename = os.path.join(dir, 'wu.png')
+filename = os.path.join(dir, 'apotheke.png')
 
 with open(filename, "rb") as image_file:
 
