@@ -710,7 +710,8 @@ def fetch_ios_reviews(app_id, country_code):
 
     """
 
-    url = fhttps://itunes.apple.com/{country_code}/rss/customerreviews/id={app_id}/sortBy=mostRecent/json
+    url = f"https://itunes.apple.com/{country_code}/rss/customerreviews/id={app_id}/sortBy=mostRecent/json"
+
 
     reviews = []
 
