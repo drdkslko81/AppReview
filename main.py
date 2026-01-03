@@ -185,13 +185,13 @@ local_css("custom_style.css")
 
 # Load and encode image
 
-# dir = os.path.dirname(__file__)
+dir = os.path.dirname(__file__)
 
-# filename = os.path.join(dir, 'apotheke.png')
+filename = os.path.join(dir, 'apotheke.png')
 
-# with open(filename, "rb") as image_file:
+with open(filename, "rb") as image_file:
 
-#     encoded_image = base64.b64encode(image_file.read()).decode()
+    encoded_image = base64.b64encode(image_file.read()).decode()
 
  
 
