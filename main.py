@@ -1980,7 +1980,7 @@ def show_sunburst_chart(filtered_df, date1, date2):
 
         filtered_df,
 
-        path=['CountryName', 'AppName', 'rating', 'review'],
+        path=['CountryName', 'AppName', 'rating', 'review','appVersion'],
 
         values='rating',
 
@@ -2298,100 +2298,108 @@ def fast_sentiment(df):
     return df
 
 
-@st.cache_data(ttl=300)
-def generate_wordcloud_fast(text, mask=None):
-    """Cached wordcloud generation"""
-    stopwords_set = set(STOPWORDS)
-    
-    def redcare_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-        return np.random.choice(["#FF6B35", "#000000", "#FFA726"])
-    
-    wc = WordCloud(
-        stopwords=stopwords_set,
-        max_words=25,      # Balanced speed/quality
-        width=500,         # Smaller = 3x faster
-        height=350,
-        background_color='white',
-        color_func=redcare_color_func,
-        mask=mask,
-        contour_width=1,   # Faster render
-        collocations=False,
-        random_state=42    # Consistent
-    ).generate(text)
-    
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.imshow(wc, interpolation='bilinear')
-    ax.axis('off')
-    plt.tight_layout(pad=0)
-    plt.close(fig)
-    return fig
 
 def show_word_cloud(filtered_df):
+
     if filtered_df.empty:
+
         show_timed_warning_generic("⚠️ No records found within the specified date range", duration=4)
+
         return
 
-    # FAST MASK
-    mask = None
-    try:
-        mask = np.array(Image.open("Image/apotheke.png"))
-    except:
-        pass  # Silent fail
+ 
 
-    st.subheader("Word Cloud")
-    st.markdown("<h4 style='text-align: center; font-weight: bold;'>Select Sentiment</h4>", unsafe_allow_html=True)
-    
-    # INLINE SAFE SENTIMENT (no cache needed)
-    if 'sentiment_score' not in filtered_df.columns:
-        filtered_df = filtered_df.copy()
-        filtered_df['sentiment_score'] = filtered_df['review'].apply(
-            lambda x: sia.polarity_scores(str(x))['compound']
-        )
+    with st.spinner("☁️ Generating Word Cloud, Please wait..."):
+
+        # Use Western Union colors: yellow and black
+
+        western_union_colors = ["#ffdd00", "#000000"]
+
+ 
+
+        # Optional mask image
+
+        try:
+
+            mask = np.array(Image.open("Images/wuupdated.png"))
+
+        except Exception as e:
+
+            mask = None
+
+            print(f"Mask image not found or failed to load: {e}")
+
+ 
+
+        st.subheader("Word Cloud")
+
+ 
+
+        # Sentiment scoring
+
+        filtered_df['sentiment_score'] = filtered_df['review'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
+
         filtered_df['sentiment_label'] = filtered_df['sentiment_score'].apply(
-            lambda x: 'Positive' if pd.notna(x) and x > 0.2 
-                     else ('Negative' if pd.notna(x) and x < -0.2 else 'Neutral')
+
+            lambda x: 'Positive' if x > 0.2 else ('Negative' if x < -0.2 else 'Neutral')
+
         )
 
-    sentiment_option = st.selectbox("", 
-        sorted(filtered_df['sentiment_label'].value_counts().index.tolist()))
-    
-    # FAST FILTER
-    df_sent = filtered_df[filtered_df['sentiment_label'] == sentiment_option]
-    if df_sent.empty:
-        st.warning("No reviews for selected sentiment.")
-        return
+ 
 
-    # ULTRA-FAST TEXT (truncate)
-    text = " ".join(df_sent['review'].dropna().astype(str).str[:120].tolist())
+        st.markdown("<h4 style='text-align: center; font-weight: bold;'>Select Sentiment for Word Cloud</h4>", unsafe_allow_html=True)
 
-    # INLINE WORDCLOUD (no cache crash)
-    stopwords_set = set(STOPWORDS)
-    
-    def redcare_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-        return np.random.choice(["#FF6B35", "#000000", "#FFA726"])
+        sentiment_option = st.selectbox("", filtered_df['sentiment_label'].unique())
 
-    try:
-        wc = WordCloud(
+        st.markdown("<br>", unsafe_allow_html=True)
+
+ 
+
+        text = " ".join(filtered_df[filtered_df['sentiment_label'] == sentiment_option]['review'].astype(str))
+
+        stopwords_set = set(STOPWORDS)
+
+ 
+
+        def western_union_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+
+            return np.random.choice(western_union_colors)
+
+ 
+
+        wordcloud = WordCloud(
+
             stopwords=stopwords_set,
-            max_words=30,      # Fast
-            width=480, height=320,  # Compact
+
+            max_words=15,
+
+            width=600,
+
+            height=450,
+
             background_color='white',
-            color_func=redcare_color_func,
+
+            color_func=western_union_color_func,
+
             mask=mask,
-            contour_width=1,
-            collocations=False,
-            random_state=42
+
+            contour_color='black',
+
+            contour_width=2,
+
+            collocations=False
+
         ).generate(text)
 
-        fig, ax = plt.subplots(figsize=(8, 4.5))
-        ax.imshow(wc, interpolation='bilinear')
+ 
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        ax.imshow(wordcloud, interpolation='bilinear')
+
         ax.axis('off')
-        plt.tight_layout(pad=0)
+
         st.pyplot(fig)
-        plt.close(fig)
-    except Exception as e:
-        st.error(f"WordCloud render failed: {str(e)[:100]}")
-        st.info("Try shorter date range or fewer reviews.")
 
  
 
@@ -3366,44 +3374,42 @@ def show_customer_insights(all_df):
 
  
 
-    # Actionable recommendations box (derived from above signals)
-
     st.subheader("Actionable recommendations")
 
     recs = []
 
-    # pricing
+    # pricing inconsistencies (app vs browser, higher prices)
+    if issues_df.loc[issues_df['issue'].str.contains("price|pricing|expensive|teuer|gnstig", case=False), "last_year"].sum() > 0:
+        recs.append("- Align app pricing with browser/website; investigate in-app premiums and dynamic pricing issues.")
 
-    if issues_df.loc[issues_df['issue'].str.contains("Pricing", case=False), "last_year"].sum() > 0:
+    # crashes/bugs/stability
+    if issues_df.loc[issues_df['issue'].str.contains("crash|buggy|bug|freeze|stuck|loading|slow", case=False), "last_year"].sum() > 0:
+        recs.append("- Prioritize stability fixes (crashes, freezes, slow loading) for top affected appVersion/countries.")
 
-        recs.append("- Review pricing / exchange rate policy for countries where pricing mentions are high.")
+    # login/OTP/auth issues (login, code, password, 2FA)
+    if issues_df.loc[issues_df['issue'].str.contains("login|OTP|code|password|2FA|authenticator", case=False), "last_year"].sum() > 0:
+        recs.append("- Fix login/OTP flows: stabilize app switches during 2FA/PayPal; improve code delivery.")
 
-    # crashes
+    # payment/voucher issues (PayPal, coupon, voucher, gutschein)
+    if issues_df.loc[issues_df['issue'].str.contains("payment|PayPal|card|voucher|coupon|gutschein|discount", case=False), "last_year"].sum() > 0:
+        recs.append("- Stabilize payments (PayPal webview resets, card failures); ensure vouchers apply without errors.")
 
-    if issues_df.loc[issues_df['issue'].str.contains("Crashes", case=False), "last_year"].sum() > 0:
+    # delivery delays/tracking
+    if issues_df.loc[issues_df['issue'].str.contains("delivery|late|versand|liefer|tracking|status", case=False), "last_year"].sum() > 0:
+        recs.append("- Improve delivery reliability: accurate ETAs, real-time tracking, and in-app cancellations.")
 
-        recs.append("- Prioritise stability fixes (crash/freeze) for top affected appVersion/countries.")
-
-    # otp
-
-    if issues_df.loc[issues_df['issue'].str.contains("OTP", case=False), "last_year"].sum() > 0:
-
-        recs.append("- Investigate OTP delivery for mobile operators in countries with repeated OTP failures.")
+    # UI/UX issues (switching apps, ads, language)
+    if issues_df.loc[issues_df['issue'].str.contains("UI|switch|ads|werbung|english|language", case=False), "last_year"].sum() > 0:
+        recs.append("- Enhance UX: reduce ads/popups, full multi-language support, app-switch resilience.")
 
     # version regressions
-
     if not vcmp.empty and (vcmp["delta"] < -0.1).any():
-
         recs.append("- Roll back or hotfix app versions with significant rating drops (delta <= -0.1).")
 
     if len(recs) == 0:
-
         recs.append("- No strong automated signals found. Consider deeper manual review or upload competitor data for benchmarking.")
 
- 
-
     for r in recs:
-
         st.markdown(r)
 
  
@@ -3661,123 +3667,47 @@ def show_complaint_analytics(filtered_df, date1, date2):
 
     st.markdown("### 📋 Top Issues Ranked")
 
- 
-
     top_issues = compute_top_issues(df_neg, analysis_data.get('issues', {}), total_complaints)
 
- 
-
     if top_issues.empty:
-
         st.info("No top issues detected for the selected filters/date range.")
-
     else:
-
         display_df = top_issues.copy()
-
- 
-
-        # 1) Round Priority Score (e.g., 32.4000 → 32.4)
-
-        display_df['Priority Score'] = (
-
-            display_df['Priority Score']
-
-            .astype(float)
-
-            .round(1)
-
-        )
-
- 
-
-        # 2) Add S.No. as the first column, starting from 1
-
+        display_df['Priority Score'] = display_df['Priority Score'].astype(float).round(1)
         display_df.insert(0, 'S.No.', range(1, len(display_df) + 1))
-
- 
-
-        # 3) Build centered, full-width HTML table
-
-        table_html = display_df.to_html(index=False, classes='top-issues-table')
-
- 
-
-        st.markdown(
-
-            """
-
-            <style>
-
-            /* Center the table block and make it full width */
-
-            .top-issues-wrapper {
-
-                display: flex;
-
-                justify-content: center;   /* center the block */
-
-                width: 100%;
-
+        
+        # Clean, simple dataframe - 100% compatible
+        st.dataframe(
+            display_df[['S.No.', 'Issue', 'Count', '% of Total', 'Priority Score']],
+            use_container_width=True,
+            height=350,
+            hide_index=True,
+            column_config={
+                "S.No.": st.column_config.NumberColumn("Rank", width="small"),
+                "Priority Score": st.column_config.ProgressColumn(
+                    "Priority", min_value=0.0, max_value=1.0, width="medium"
+                )
             }
-
-            .top-issues-table {
-
-                width: 100%;               /* expand to fill width */
-
-                border-collapse: collapse;
-
-                font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-
-            }
-
-            .top-issues-table th, .top-issues-table td {
-
-                padding: 0.5rem 0.75rem;
-
-                border-bottom: 1px solid rgba(0,0,0,0.08);
-
-                text-align: left;          /* keep text left-aligned for readability */
-
-            }
-
-            .top-issues-table th {
-
-                font-weight: 600;
-
-                background: rgba(0,0,0,0.02);
-
-            }
-
-            </style>
-
-            """,
-
-            unsafe_allow_html=True
-
         )
+        
+        # Manual high-priority highlight (text-based)
+        high_priority = display_df[display_df['Priority Score'] > 0.5]
+        if not high_priority.empty:
+            st.error("🔥 **HIGH PRIORITY (>0.5)**:")
+            for _, row in high_priority.iterrows():
+                st.markdown(f"**{int(row['S.No.'])}.** {row['Issue']} ({row['Count']:,} | {row['Priority Score']:.2f} ⚠️)")
 
- 
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Complaints", f"{int(total_complaints):,}")
+        with col2:
+            st.metric("High Priority", high_priority.shape[0])
 
-        st.markdown(
+    st.markdown("---")
 
-            f"""
 
-            <div class="top-issues-wrapper">
 
-                {table_html}
 
-            </div>
-
-            """,
-
-            unsafe_allow_html=True
-
-        )
-
- 
-
-    st.markdown("<br><br>", unsafe_allow_html=True)
 
    
 
@@ -4063,148 +3993,183 @@ def show_complaint_analytics(filtered_df, date1, date2):
 
  
 
+    # === TOP ISSUES WIDGETS - Self-contained ===
+    # Compute issues_df locally (matches your buckets logic)
+    buckets = {
+        "Crashes": ["crash", "crashing", "freeze", "frozen", "stuck", "buggy"],
+        "Ads/Popups": ["ad", "ads", "popup", "advertisement", "werbung"],
+        "Payment Failed": ["payment", "paypal", "card declined", "transaction failed"],
+        "Delivery Delay": ["delivery", "late", "delayed", "not arrived"],
+        # Add more from your issuekeywords
+    }
+
+    issues_list = []
+    for issue_name, keywords in buckets.items():
+        pattern = '|'.join(keywords)
+        mask = filtered_df['review'].fillna('').str.lower().str.contains(pattern, case=False, na=False)
+        count_last_year = mask.sum()  # Adjust if you have date filter
+        issues_list.append({'issue': issue_name, 'last_year': count_last_year})
+
+    issues_df = pd.DataFrame(issues_list).sort_values('last_year', ascending=False)
+
+    # Now render widgets
+    colors = ['#10B981', '#F59E0B', '#3B82F6', '#EF4444']
+    top_issues_df = issues_df.nlargest(4, 'last_year')[['issue', 'last_year']]
+    col1, col2, col3, col4 = st.columns(4)
+    for i, (_, row) in enumerate(top_issues_df.iterrows()):
+        col = [col1, col2, col3, col4][i]
+        with col:
+            html = f"""
+            <div style='background-color: {colors[i]}; padding: 20px; border-radius: 10px; text-align: center;'>
+                <h3 style='color:white; margin: 0;'>Top Issue</h3>
+                <h2 style='color:white; margin: 10px 0;'>{row['issue']}</h2>
+                <p style='color:white; font-size: 24px; margin: 0;'>{int(row['last_year'])} cases</p>
+            </div>
+            """
+            st.markdown(html, unsafe_allow_html=True)
+    # === END TOP ISSUES ===
 
     
 
-    # === SUMMARY CARDS ===
+    # # === SUMMARY CARDS ===
 
-    st.markdown("---")
+    # st.markdown("---")
 
-    if top_issues.empty:
+    # if top_issues.empty:
 
-        st.info("Summary metrics not available (no detected issues).")
+    #     st.info("Summary metrics not available (no detected issues).")
 
-    else:
+    # else:
 
-        col1, col2, col3, col4 = st.columns(4)
+    #     col1, col2, col3, col4 = st.columns(4)
 
-        top0 = top_issues.iloc[0]
-
- 
-
-        # Safely compute top country and its complaint count
-
-        if 'CountryName' in df_neg.columns and not df_neg.empty:
-
-            country_series = (
-
-                df_neg['CountryName']
-
-                .astype(str).str.strip()
-
-                .replace({'': 'Unknown'}).fillna('Unknown')
-
-            )
-
-            vc = country_series.value_counts()
-
-            top_country = vc.index[0] if len(vc) > 0 else "N/A"
-
-            top_country_count = int(vc.iloc[0]) if len(vc) > 0 else 0
-
-        else:
-
-            top_country, top_country_count = "N/A", 0
+    #     top0 = top_issues.iloc[0]
 
  
 
-        # Average severity (sentiment score)
+    #     # Safely compute top country and its complaint count
 
-        avg_sev_series = df_neg.get("sentiment_score", pd.Series(dtype=float))
+    #     if 'CountryName' in df_neg.columns and not df_neg.empty:
 
-        avg_sev = float(avg_sev_series.mean()) if not avg_sev_series.empty else 0.0
+    #         country_series = (
 
- 
+    #             df_neg['CountryName']
 
-        with col1:
+    #             .astype(str).str.strip()
 
-            st.markdown(f"""
+    #             .replace({'': 'Unknown'}).fillna('Unknown')
 
-            <div class="metric-card" style="background: linear-gradient(135deg, #66bb6a, #388e3c);">
+    #         )
 
-                <h3 style='color:white;'>Top Issue</h3>
+    #         vc = country_series.value_counts()
 
-                <h2 style='color:white;'>{top0['Issue']}</h2>
+    #         top_country = vc.index[0] if len(vc) > 0 else "N/A"
 
-                <p style='color:white;'>{int(top0['Count'])} cases</p>
+    #         top_country_count = int(vc.iloc[0]) if len(vc) > 0 else 0
 
-            </div>
+    #     else:
 
-            """, unsafe_allow_html=True)
-
- 
-
-       
-
-        with col2:
-
-            st.markdown(f"""
-
-            <div class="metric-card" style="background: linear-gradient(135deg, #ffa726, #fb8c00);">
-
-                <h3 style='color:white;'>Highest Priority</h3>
-
-                <h2 style='color:white;'>{top0['Issue']}</h2>
-
-                <p style='color:white;'>Score: {float(top0['Priority Score']):.1f}</p>
-
-                <p style='color:white; font-size:0.85em;'>(Most severe & frequent)</p>
-
-            </div>
-
-            """, unsafe_allow_html=True)
+    #         top_country, top_country_count = "N/A", 0
 
  
 
+    #     # Average severity (sentiment score)
+
+    #     avg_sev_series = df_neg.get("sentiment_score", pd.Series(dtype=float))
+
+    #     avg_sev = float(avg_sev_series.mean()) if not avg_sev_series.empty else 0.0
+
  
 
-        with col3:
+    #     with col1:
 
-            st.markdown(f"""
+    #         st.markdown(f"""
 
-            <div class="metric-card" style="background: linear-gradient(135deg, #42a5f5, #1976d2);">
+    #         <div class="metric-card" style="background: linear-gradient(135deg, #66bb6a, #388e3c);">
 
-                <h3 style='color:white;'>Most Complaints</h3>
+    #             <h3 style='color:white;'>Top Issue</h3>
 
-                <h2 style='color:white;'>{top_country}</h2>
+    #             <h2 style='color:white;'>{top0['Issue']}</h2>
 
-                <p style='color:white;'>{top_country_count} complaints</p>
+    #             <p style='color:white;'>{int(top0['Count'])} cases</p>
 
-            </div>
+    #         </div>
 
-            """, unsafe_allow_html=True)
+    #         """, unsafe_allow_html=True)
 
  
 
        
 
-        with col4:
+    #     with col2:
 
-            # Interpret severity
+    #         st.markdown(f"""
 
-            severity_label = (
+    #         <div class="metric-card" style="background: linear-gradient(135deg, #ffa726, #fb8c00);">
 
-                "Very Negative" if avg_sev < 0.3 else
+    #             <h3 style='color:white;'>Highest Priority</h3>
 
-                "Negative" if avg_sev < 0.5 else
+    #             <h2 style='color:white;'>{top0['Issue']}</h2>
 
-                "Moderate"
+    #             <p style='color:white;'>Score: {float(top0['Priority Score']):.1f}</p>
 
-            )
+    #             <p style='color:white; font-size:0.85em;'>(Most severe & frequent)</p>
 
-            st.markdown(f"""
+    #         </div>
 
-            <div class="metric-card" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">
+    #         """, unsafe_allow_html=True)
 
-                <h3 style='color:white;'>Avg Severity</h3>
+ 
 
-                <h2 style='color:white;'>{avg_sev:.2f}</h2>
+ 
 
-                <p style='color:white;'>Overall sentiment: {severity_label}</p>
+    #     with col3:
 
-            </div>
+    #         st.markdown(f"""
 
-            """, unsafe_allow_html=True)
+    #         <div class="metric-card" style="background: linear-gradient(135deg, #42a5f5, #1976d2);">
+
+    #             <h3 style='color:white;'>Most Complaints</h3>
+
+    #             <h2 style='color:white;'>{top_country}</h2>
+
+    #             <p style='color:white;'>{top_country_count} complaints</p>
+
+    #         </div>
+
+    #         """, unsafe_allow_html=True)
+
+ 
+
+       
+
+    #     with col4:
+
+    #         # Interpret severity
+
+    #         severity_label = (
+
+    #             "Very Negative" if avg_sev < 0.3 else
+
+    #             "Negative" if avg_sev < 0.5 else
+
+    #             "Moderate"
+
+    #         )
+
+    #         st.markdown(f"""
+
+    #         <div class="metric-card" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">
+
+    #             <h3 style='color:white;'>Avg Severity</h3>
+
+    #             <h2 style='color:white;'>{avg_sev:.2f}</h2>
+
+    #             <p style='color:white;'>Overall sentiment: {severity_label}</p>
+
+    #         </div>
+
+    #         """, unsafe_allow_html=True)
 
  
 
