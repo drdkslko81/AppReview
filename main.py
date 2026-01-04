@@ -2304,7 +2304,7 @@ def show_word_cloud(filtered_df):
         st.warning("⚠️ No records found")
         return
 
-    st.subheader("Word Cloud - Debug Version")
+    st.subheader("Word Cloud")
 
     # Quick sentiment
     filtered_df['sentiment_score'] = filtered_df['review'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
