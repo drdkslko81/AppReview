@@ -2300,106 +2300,61 @@ def fast_sentiment(df):
 
 
 def show_word_cloud(filtered_df):
-
     if filtered_df.empty:
-
-        show_timed_warning_generic("⚠️ No records found within the specified date range", duration=4)
-
+        st.warning("⚠️ No records found")
         return
 
- 
+    st.subheader("Word Cloud - Debug Version")
 
-    with st.spinner("☁️ Generating Word Cloud, Please wait..."):
+    # Quick sentiment
+    filtered_df['sentiment_score'] = filtered_df['review'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
+    filtered_df['sentiment_label'] = filtered_df['sentiment_score'].apply(
+        lambda x: 'Positive' if x > 0.2 else ('Negative' if x < -0.2 else 'Neutral')
+    )
 
-        # Use Western Union colors: yellow and black
+    sentiment_option = st.selectbox("Sentiment:", filtered_df['sentiment_label'].unique())
+    
+    # DEBUG: Show counts
+    filtered_count = len(filtered_df[filtered_df['sentiment_label'] == sentiment_option])
+    st.info(f"Found {filtered_count} reviews for '{sentiment_option}'")
+    
+    if filtered_count == 0:
+        st.error("No reviews for this sentiment!")
+        return
 
-        western_union_colors = ["#ffdd00", "#000000"]
+    # Clean text carefully
+    reviews = filtered_df[filtered_df['sentiment_label'] == sentiment_option]['review'].dropna()
+    clean_reviews = reviews.astype(str).str.strip()
+    clean_reviews = clean_reviews[clean_reviews.str.len() > 2]  # Min 3 chars
+    text = " ".join(clean_reviews)
+    
+    st.text(f"Text preview: '{text[:100]}...' (len={len(text)})")
+    
+    if len(text) < 10:
+        st.error("Text too short!")
+        return
 
- 
-
-        # Optional mask image
-
-        try:
-
-            mask = np.array(Image.open("Images/wuupdated.png"))
-
-        except Exception as e:
-
-            mask = None
-
-            print(f"Mask image not found or failed to load: {e}")
-
- 
-
-        st.subheader("Word Cloud")
-
- 
-
-        # Sentiment scoring
-
-        filtered_df['sentiment_score'] = filtered_df['review'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
-
-        filtered_df['sentiment_label'] = filtered_df['sentiment_score'].apply(
-
-            lambda x: 'Positive' if x > 0.2 else ('Negative' if x < -0.2 else 'Neutral')
-
-        )
-
- 
-
-        st.markdown("<h4 style='text-align: center; font-weight: bold;'>Select Sentiment for Word Cloud</h4>", unsafe_allow_html=True)
-
-        sentiment_option = st.selectbox("", filtered_df['sentiment_label'].unique())
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
- 
-
-        text = " ".join(filtered_df[filtered_df['sentiment_label'] == sentiment_option]['review'].astype(str))
-
-        stopwords_set = set(STOPWORDS)
-
- 
-
-        def western_union_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-
-            return np.random.choice(western_union_colors)
-
- 
-
-        wordcloud = WordCloud(
-
-            stopwords=stopwords_set,
-
-            max_words=15,
-
-            width=600,
-
-            height=450,
-
-            background_color='white',
-
-            color_func=western_union_color_func,
-
-            mask=mask,
-
-            contour_color='black',
-
-            contour_width=2,
-
-            collocations=False
-
+    # SIMPLIFIED WordCloud - NO mask, NO custom color func
+    try:
+        from wordcloud import WordCloud
+        import matplotlib.pyplot as plt
+        
+        wc = WordCloud(
+            width=600, height=450, background_color='white',
+            max_words=20, collocations=False, stopwords=STOPWORDS
         ).generate(text)
-
- 
-
+        
         fig, ax = plt.subplots(figsize=(10, 5))
-
-        ax.imshow(wordcloud, interpolation='bilinear')
-
+        ax.imshow(wc, interpolation='bilinear')
         ax.axis('off')
-
         st.pyplot(fig)
+        st.success("✅ WordCloud generated successfully!")
+        
+    except Exception as e:
+        st.error(f"❌ FAILED: {type(e).__name__}: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc(), language='python')
+
 
  
 
@@ -4275,7 +4230,7 @@ with st.sidebar:
 
                 "font-weight": "bold",     # Bold for selected
 
-                "background-color": "#ffdd00",
+                "background-color": "#e0e0e0",
 
             },
 
