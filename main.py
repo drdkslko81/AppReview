@@ -1,197 +1,179 @@
 # import urllib3
-
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 import json
-
 with open("country_config.json", "r") as f:
-
     country_map = json.load(f)
-
 from streamlit_option_menu import option_menu   
-
 import streamlit as st
-
 import plotly.graph_objects as go
-
 import pandas as pd
-
 import base64
-
 import random
-
 import io
-
 import pandas as pd
-
 import qrcode
-
 from concurrent.futures import ThreadPoolExecutor
-
 from st_aggrid import AgGrid, GridOptionsBuilder, JsCode
-
 from sklearn.feature_extraction.text import CountVectorizer
-
 from sklearn.decomposition import LatentDirichletAllocation
-
 from fpdf import FPDF
-
 import nltk
-
 from nltk.util import ngrams
-
 from collections import Counter
-
 import plotly.express as px
-
 import random
-
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
-
 from streamlit.column_config import TextColumn
-
 import requests
-
 import pandas as pd
-
 from concurrent.futures import ThreadPoolExecutor
-
 import plotly.express as px
-
 import pandas as pd
-
 import numpy as np
-
 from datetime import date, timedelta
-
 import time
-
 from fpdf import FPDF
-
 from sklearn.cluster import KMeans
-
 import warnings
-
 import requests
-
 import datetime
-
 from languages import *
-
 from sklearn.feature_extraction.text import CountVectorizer
-
 from sklearn.decomposition import LatentDirichletAllocation
-
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
 import nltk
-
 import plotly.express as px
-
 from google_play_scraper import reviews, Sort
-
 import os
-
 from google_play_scraper import Sort, reviews_all
-
 from app_store_scraper import AppStore
-
 import seaborn as sns
-
 import pycountry
-
 from wordcloud import WordCloud, STOPWORDS
-
 from langdetect import detect
-
 import matplotlib.pyplot as plt
-
 from nltk.util import ngrams
-
 from PIL import Image
-
 from collections import Counter
-
 from googletrans import Translator
-
 from languages import *
-
 warnings.filterwarnings('ignore')
-
-#nltk.download('punkt')
-
-#nltk.download('words')
-
 from sklearn.feature_extraction.text import CountVectorizer
-
 from sklearn.decomposition import LatentDirichletAllocation
-
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
 from streamlit_plotly_events import plotly_events
-
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
 from langdetect import detect
-
 import pandas as pd
-
 import warnings
-
 import matplotlib.pyplot as plt
 
 # from transformers import pipeline
-
 from nltk.corpus import stopwords
-
 from streamlit_autorefresh import st_autorefresh 
 
+import nltk
+# AUTO-FIX NLTK - Runs once
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab', quiet=True)
+    nltk.download('punkt', quiet=True)
+except:
+    nltk.download('punkt', quiet=True)
 # st.set_page_config(page_title="Apotheke Customer Sentiment Analyzer!!!", page_icon=":sparkles:",layout="wide")
- 
+st.set_page_config(page_title="Apotheke Customer Sentiment Analyzer!!!", page_icon="apotheke.png", layout="wide")
 
-st.set_page_config(
-
-    page_title="Apotheke Customer Sentiment Analyzer!!!",
-
-    page_icon="apotheke.png",  # File must be in the root directory
-
-    layout="wide"
-
-)
 
 # st.title(" :sparkles: Sentiment Anaylzer")
-
 st.markdown('<style>div.block-container{padding-top:0rem;text-align: center}</style>',unsafe_allow_html=True)
 
- 
-
- 
-
 def local_css(file_name):
-
     with open(file_name) as f:
-
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
- 
-
 #load the style sheet
-
 local_css("custom_style.css")
 
- 
 
-# st.sidebar.image("images/wufull.png", use_column_width=True)
 
 # Load and encode image
 
-dir = os.path.dirname(__file__)
+# Load and encode image safely
+dir_path = os.path.dirname(__file__)
+filename = os.path.join(dir_path, "apotheke.png")
+try:
+    with open(filename, "rb") as image_file:
+        encoded_image = base64.b64encode(image_file.read()).decode()
+    
+    # Clean sidebar image display
+    st.sidebar.markdown(
+        f"""
+        <div style="text-align: center; margin-bottom: 5px;">
+            <img src="data:image/png;base64,{encoded_image}" 
+                 style="width: 50%; max-width: 50px; border-radius: 1px;">
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+except FileNotFoundError:
+    st.sidebar.warning("apotheke.png missing")
+except Exception as e:
+    st.sidebar.error(f"Image read error: {e}")
 
-filename = os.path.join(dir, 'apotheke.png')
 
-with open(filename, "rb") as image_file:
+# st.markdown("""
+# <style>
+# /* Consistent metric card sizing and alignment */
+# .metric-card {
+#     padding: 1rem;
+#     border-radius: 10px;
+#     margin: 0.5rem;
+#     height: 160px;              
+#     display: flex;
+#     flex-direction: column;
+#     justify-content: center;    
+#     align-items: center;       
+#     text-align: center;
+#     box-sizing: border-box;
+# }
 
-    encoded_image = base64.b64encode(image_file.read()).decode()
+
+# /* Clamp long heading to prevent overflow */
+# .metric-card h2 {
+#     margin: 6px 0 2px 0;
+#     font-size: 1.6rem;
+#     line-height: 1.2;
+#     max-width: 100%;
+#     overflow: hidden;
+#     text-overflow: ellipsis;
+#     white-space: nowrap;      
+# }
+
+ 
+# .metric-card h3 {
+#     margin: 0;
+#     font-size: 1.0rem;
+#     line-height: 1.2;
+# }
+
+
+
+# .metric-card p {
+#     margin: 2px 0 0 0;
+#     font-size: 0.95rem;
+# }
+
+# /* Optional: ensure equal column height behavior in Streamlit columns */
+
+# .block-container .row-widget stHorizontalBlock > div {
+
+#     display: flex;
+
+# }
+
+# </style>
+
+# """, unsafe_allow_html=True)
 
  
 
@@ -199,219 +181,99 @@ with open(filename, "rb") as image_file:
 
  
 
-st.markdown("""
 
-<style>
-
-/* Consistent metric card sizing and alignment */
-
-.metric-card {
-
-    padding: 1rem;
-
-    border-radius: 10px;
-
-    margin: 0.5rem;
-
-    height: 160px;              
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;    
-
-    align-items: center;       
-
-    text-align: center;
-
-    box-sizing: border-box;
-
-}
-
- 
-
-/* Clamp long heading to prevent overflow */
-
-.metric-card h2 {
-
-    margin: 6px 0 2px 0;
-
-    font-size: 1.6rem;
-
-    line-height: 1.2;
-
-    max-width: 100%;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;      
-
-}
-
- 
-
-.metric-card h3 {
-
-    margin: 0;
-
-    font-size: 1.0rem;
-
-    line-height: 1.2;
-
-}
-
- 
-
-.metric-card p {
-
-    margin: 2px 0 0 0;
-
-    font-size: 0.95rem;
-
-}
-
- 
-
-/* Optional: ensure equal column height behavior in Streamlit columns */
-
-.block-container .row-widget stHorizontalBlock > div {
-
-    display: flex;
-
-}
-
-</style>
-
-""", unsafe_allow_html=True)
 
  
 
  
 
- 
+# st.markdown("""
 
-st.sidebar.markdown(f"""
+# <style>
 
-    <style>
+# /* Sidebar header compact */
 
-        .no-fullscreen-sidebar img {{
+# section[data-testid="stSidebar"] h1,
 
-            pointer-events: none;
+# section[data-testid="stSidebar"] h2,
 
-            user-select: none;
+# section[data-testid="stSidebar"] h3 {
 
-        }}
+#     text-align: left !important;
 
-        [title="View fullscreen"] {{
+#     padding-left: 4px !important;
 
-            display: none !important;
+#     margin-top: 0px !important;
 
-        }}
+#     margin-bottom: 4px !important;
 
-    </style>
-
-    <div class="no-fullscreen-sidebar" style="text-align: center;">
-
-        <img src="data:image/png;base64,{encoded_image}" style="width: 100%;margin-top: 10px;margin-bottom: 20px;"/>
-
-    </div>
-
-""", unsafe_allow_html=True)
+# }
 
  
 
- 
+# /* Remove extra spacing between buttons */
 
-st.markdown("""
+# section[data-testid="stSidebar"] div.stButton {
 
-<style>
+#     margin: 0px !important;       /* Remove margin around button container */
 
-/* Sidebar header compact */
+#     padding: 0px !important;      /* Remove padding inside container */
 
-section[data-testid="stSidebar"] h1,
+#     line-height: 1 !important;    /* Compact line height */
 
-section[data-testid="stSidebar"] h2,
-
-section[data-testid="stSidebar"] h3 {
-
-    text-align: left !important;
-
-    padding-left: 4px !important;
-
-    margin-top: 0px !important;
-
-    margin-bottom: 4px !important;
-
-}
+# }
 
  
 
-/* Remove extra spacing between buttons */
+# /* Make buttons inline-block to reduce gaps */
 
-section[data-testid="stSidebar"] div.stButton {
+# section[data-testid="stSidebar"] div.stButton > button {
 
-    margin: 0px !important;       /* Remove margin around button container */
+#     display: block !important;    /* Ensure full width */
 
-    padding: 0px !important;      /* Remove padding inside container */
+#     background-color: transparent !important;
 
-    line-height: 1 !important;    /* Compact line height */
+#     color: #0066cc !important;
 
-}
+#     border: none !important;
 
- 
+#     font-size: 2px !important;
 
-/* Make buttons inline-block to reduce gaps */
+#     text-align: left !important;
 
-section[data-testid="stSidebar"] div.stButton > button {
+#     justify-content: flex-start !important;
 
-    display: block !important;    /* Ensure full width */
+#     padding: .5px 4px !important;  /* Minimal padding */
 
-    background-color: transparent !important;
+#     width: 100% !important;
 
-    color: #0066cc !important;
+#     margin: 0px !important;       /* Remove extra margin */
 
-    border: none !important;
-
-    font-size: 2px !important;
-
-    text-align: left !important;
-
-    justify-content: flex-start !important;
-
-    padding: .5px 4px !important;  /* Minimal padding */
-
-    width: 100% !important;
-
-    margin: 0px !important;       /* Remove extra margin */
-
-}
+# }
 
  
 
-/* Hover and active states */
+# /* Hover and active states */
 
-section[data-testid="stSidebar"] div.stButton > button:hover {
+# section[data-testid="stSidebar"] div.stButton > button:hover {
 
-    color: #ff6600 !important;
+#     color: #ff6600 !important;
 
-    text-decoration: underline !important;
+#     text-decoration: underline !important;
 
-}
+# }
 
-section[data-testid="stSidebar"] div.stButton.active > button {
+# section[data-testid="stSidebar"] div.stButton.active > button {
 
-    font-weight: bold !important;
+#     font-weight: bold !important;
 
-    color: #ff6600 !important;
+#     color: #ff6600 !important;
 
-}
+# }
 
-</style>
+# </style>
 
-""", unsafe_allow_html=True)
+# """, unsafe_allow_html=True)
 
  
 
@@ -419,43 +281,43 @@ section[data-testid="stSidebar"] div.stButton.active > button {
 
  
 
-st.markdown("""
+# st.markdown("""
 
-    <style>
+#     <style>
 
-    .nav-link:last-child {
+#     .nav-link:last-child {
 
-        background: linear-gradient(90deg, #ffdd00, #ffa500) !important;
+#         background: linear-gradient(90deg, #ffdd00, #ffa500) !important;
 
-        color: #000 !important;
+#         color: #000 !important;
 
-        font-weight: bold !important;
+#         font-weight: bold !important;
 
-    }
+#     }
 
-    </style>
+#     </style>
 
-""", unsafe_allow_html=True)
-
- 
+# """, unsafe_allow_html=True)
 
  
 
  
 
-st.markdown("""
+ 
 
-    <style>
+# st.markdown("""
 
-    div[data-baseweb="select"] > div {
+#     <style>
 
-        text-align: left !important;
+#     div[data-baseweb="select"] > div {
 
-    }
+#         text-align: left !important;
 
-    </style>
+#     }
 
-    """, unsafe_allow_html=True)
+#     </style>
+
+#     """, unsafe_allow_html=True)
 
  
 
@@ -794,9 +656,9 @@ def fetch_all_ios(app_country_list):
 
 app_details = [
 
-    ('com.westernunion.android.mtapp', 'us', 'Android'),
+ 
 
-    ('com.westernunion.moneytransferr3app.es', 'es', 'Android')     
+    ('shop.shop_apotheke.com.shopapotheke', 'us', 'Android')      
 
 ]
 
@@ -804,23 +666,12 @@ app_details = [
 
 app_country_list = [
 
-    ("424716908", "us"),
+    ("1104967519", "us"),
 
-    ("1045347175","fr"),
-
-    ("1199782520","jp"),
 
 ]
 
- 
 
- 
-
-# --- MAIN STREAMLIT BLOCK ---
-
-# st.title("🌍 Western Union Reviews Dashboard")
-
- 
 
 @st.cache_data(ttl=86400, show_spinner=False)
 
@@ -2094,9 +1945,9 @@ def show_sunburst_chart(filtered_df, date1, date2):
 
  
 
-    if date_diff > 90:
+    if date_diff > 365:
 
-        show_timed_warning_generic("⚠️ Sunburst Chart is disabled for date ranges longer than 3 months", duration=3)
+        show_timed_warning_generic("⚠️ Sunburst Chart is disabled for date ranges longer than 12 months", duration=3)
 
         return
 
@@ -2428,110 +2279,122 @@ def remove_emojis(text):
     return text.encode('ascii', 'ignore').decode('ascii')
 
  
+@st.cache_data(ttl=300)
+def fast_sentiment(df):
+    """Safe sentiment - handles existing columns"""
+    df = df.copy()
+    
+    # Compute score
+    df['sentiment_score'] = df['review'].apply(
+        lambda x: sia.polarity_scores(str(x))['compound']
+    )
+    
+    # FIXED: Safe label logic - check if column exists + type
+    if 'sentiment_label' not in df.columns or df['sentiment_label'].dtype == 'object':
+        df['sentiment_label'] = df['sentiment_score'].apply(
+            lambda x: 'Positive' if x > 0.2 else ('Negative' if x < -0.2 else 'Neutral')
+        )
+    
+    return df
 
- 
+
+@st.cache_data(ttl=300)
+def generate_wordcloud_fast(text, mask=None):
+    """Cached wordcloud generation"""
+    stopwords_set = set(STOPWORDS)
+    
+    def redcare_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+        return np.random.choice(["#FF6B35", "#000000", "#FFA726"])
+    
+    wc = WordCloud(
+        stopwords=stopwords_set,
+        max_words=25,      # Balanced speed/quality
+        width=500,         # Smaller = 3x faster
+        height=350,
+        background_color='white',
+        color_func=redcare_color_func,
+        mask=mask,
+        contour_width=1,   # Faster render
+        collocations=False,
+        random_state=42    # Consistent
+    ).generate(text)
+    
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.imshow(wc, interpolation='bilinear')
+    ax.axis('off')
+    plt.tight_layout(pad=0)
+    plt.close(fig)
+    return fig
 
 def show_word_cloud(filtered_df):
-
     if filtered_df.empty:
-
         show_timed_warning_generic("⚠️ No records found within the specified date range", duration=4)
-
         return
 
- 
+    # FAST MASK
+    mask = None
+    try:
+        mask = np.array(Image.open("Image/apotheke.png"))
+    except:
+        pass  # Silent fail
 
-    with st.spinner("☁️ Generating Word Cloud, Please wait..."):
-
-        # Use Western Union colors: yellow and black
-
-        western_union_colors = ["#ffdd00", "#000000"]
-
- 
-
-        # Optional mask image
-
-        try:
-
-            mask = np.array(Image.open("Images/wuupdated.png"))
-
-        except Exception as e:
-
-            mask = None
-
-            print(f"Mask image not found or failed to load: {e}")
-
- 
-
-        st.subheader("Word Cloud")
-
- 
-
-        # Sentiment scoring
-
-        filtered_df['sentiment_score'] = filtered_df['review'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
-
+    st.subheader("Word Cloud")
+    st.markdown("<h4 style='text-align: center; font-weight: bold;'>Select Sentiment</h4>", unsafe_allow_html=True)
+    
+    # INLINE SAFE SENTIMENT (no cache needed)
+    if 'sentiment_score' not in filtered_df.columns:
+        filtered_df = filtered_df.copy()
+        filtered_df['sentiment_score'] = filtered_df['review'].apply(
+            lambda x: sia.polarity_scores(str(x))['compound']
+        )
         filtered_df['sentiment_label'] = filtered_df['sentiment_score'].apply(
-
-            lambda x: 'Positive' if x > 0.2 else ('Negative' if x < -0.2 else 'Neutral')
-
+            lambda x: 'Positive' if pd.notna(x) and x > 0.2 
+                     else ('Negative' if pd.notna(x) and x < -0.2 else 'Neutral')
         )
 
- 
+    sentiment_option = st.selectbox("", 
+        sorted(filtered_df['sentiment_label'].value_counts().index.tolist()))
+    
+    # FAST FILTER
+    df_sent = filtered_df[filtered_df['sentiment_label'] == sentiment_option]
+    if df_sent.empty:
+        st.warning("No reviews for selected sentiment.")
+        return
 
-        st.markdown("<h4 style='text-align: center; font-weight: bold;'>Select Sentiment for Word Cloud</h4>", unsafe_allow_html=True)
+    # ULTRA-FAST TEXT (truncate)
+    text = " ".join(df_sent['review'].dropna().astype(str).str[:120].tolist())
 
-        sentiment_option = st.selectbox("", filtered_df['sentiment_label'].unique())
+    # INLINE WORDCLOUD (no cache crash)
+    stopwords_set = set(STOPWORDS)
+    
+    def redcare_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+        return np.random.choice(["#FF6B35", "#000000", "#FFA726"])
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
- 
-
-        text = " ".join(filtered_df[filtered_df['sentiment_label'] == sentiment_option]['review'].astype(str))
-
-        stopwords_set = set(STOPWORDS)
-
- 
-
-        def western_union_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
-
-            return np.random.choice(western_union_colors)
-
- 
-
-        wordcloud = WordCloud(
-
+    try:
+        wc = WordCloud(
             stopwords=stopwords_set,
-
-            max_words=15,
-
-            width=600,
-
-            height=450,
-
+            max_words=30,      # Fast
+            width=480, height=320,  # Compact
             background_color='white',
-
-            color_func=western_union_color_func,
-
+            color_func=redcare_color_func,
             mask=mask,
-
-            contour_color='black',
-
-            contour_width=2,
-
-            collocations=False
-
+            contour_width=1,
+            collocations=False,
+            random_state=42
         ).generate(text)
 
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        ax.imshow(wc, interpolation='bilinear')
+        ax.axis('off')
+        plt.tight_layout(pad=0)
+        st.pyplot(fig)
+        plt.close(fig)
+    except Exception as e:
+        st.error(f"WordCloud render failed: {str(e)[:100]}")
+        st.info("Try shorter date range or fewer reviews.")
+
  
 
-        fig, ax = plt.subplots(figsize=(10, 5))
-
-        ax.imshow(wordcloud, interpolation='bilinear')
-
-        ax.axis('off')
-
-        st.pyplot(fig)
 
  
 
@@ -2547,9 +2410,9 @@ def show_treemap_chart(filtered_df, date1, date2):
 
     date_diff = (date2 - date1).days
 
-    if date_diff > 90:
+    if date_diff > 365:
 
-        show_timed_warning_generic("⚠️ TreeMap Chart is disabled for date ranges longer than 3 months", duration=3)
+        show_timed_warning_generic("⚠️ TreeMap Chart is disabled for date ranges longer than 12 months", duration=3)
 
         return
 
@@ -2724,32 +2587,16 @@ def show_visual_charts(filtered_df, df, date1, date2):
         # Funnel chart for issue keywords
 
         issue_keywords = {
-
-            'Crashes': ['freezes', 'crash', 'stuck'],
-
-            'Stop': ['stop', 'shut', 'close'],
-
-            'Hang': ['hang', 'hangs', 'freeze'],
-
-            'Bugs': ['bug', 'bugs', 'error'],
-
-            'Performance': ['performance', 'slow', 'lag'],
-
-            'Customer': ['customer', 'helpdesk', 'support'],
-
-            'Update': ['update', 'upgrade', 'patch'],
-
-            'Notification': ['notification', 'alert', 'popup'],
-
-            'OTP': ['otp', 'message', 'verification'],
-
-            'UI': ['ui', 'interface', 'design'],
-
-            'App': ['app', 'application', 'software']
-
- 
-
+            "Delivery Delay": ["delivery late", "late delivery", "never delivered", "not arrived", "waiting days", "delayed", "not on time"],
+            "Payment Failed": ["payment failed", "paypal", "pay pal", "card declined", "payment error", "cant pay", "transaction failed"],
+            "App Crashes": ["crash", "crashing", "crashes", "freeze", "frozen", "stuck", "keeps closing", "buggy", "error"],
+            "Login OTP": ["login", "log in", "otp", "verification code", "cant login", "password", "authentication"],
+            "Slow Loading": ["slow", "lag", "loading", "takes long", "unresponsive", "hangs"],
+            "Pricing Scam": ["expensive", "price higher", "scam", "rip off", "cheaper browser", "fee", "charge"],
+            "Ads Popups": ["ad", "ads", "popup", "advertisement", "offer spam"],
+            "Customer Service": ["support", "customer service", "helpdesk", "no response"]
         }
+
 
  
 
@@ -3934,45 +3781,45 @@ def show_complaint_analytics(filtered_df, date1, date2):
 
    
 
-    # === 5. CHURN SIGNALS ===
+    # # === 5. CHURN SIGNALS ===
 
-    if analysis_data.get('churn'):
+    # if analysis_data.get('churn'):
 
    
 
-        st.markdown("### ⚠️ Churn Risk (Competitor Mentions)")
+    #     st.markdown("### ⚠️ Churn Risk (Competitor Mentions)")
 
-        churn_df = pd.DataFrame(list(analysis_data['churn'].items()),
+    #     churn_df = pd.DataFrame(list(analysis_data['churn'].items()),
 
-                               columns=['Competitor', 'Mentions']).sort_values('Mentions', ascending=False)
+    #                            columns=['Competitor', 'Mentions']).sort_values('Mentions', ascending=False)
 
  
 
-        fig_churn = px.bar(
+    #     fig_churn = px.bar(
 
-            churn_df,
+    #         churn_df,
 
-            x='Competitor',
+    #         x='Competitor',
 
-            y='Mentions',
+    #         y='Mentions',
 
-            title="Users Threatening to Switch",
+    #         title="Users Threatening to Switch",
 
-            color='Mentions',
+    #         color='Mentions',
 
-            color_continuous_scale='OrRd',
+    #         color_continuous_scale='OrRd',
 
-            hover_data={'Mentions': True}
+    #         hover_data={'Mentions': True}
 
-         )
+    #      )
 
-        # explicit hover template to show the Mentions count
+    #     # explicit hover template to show the Mentions count
 
-        fig_churn.update_traces(hovertemplate='Competitor: %{x}<br>Mentions: %{y}<extra></extra>')
+    #     fig_churn.update_traces(hovertemplate='Competitor: %{x}<br>Mentions: %{y}<extra></extra>')
 
-        fig_churn.update_layout(coloraxis_showscale=False)
+    #     fig_churn.update_layout(coloraxis_showscale=False)
 
-        st.plotly_chart(fig_churn, use_container_width=True)
+    #     st.plotly_chart(fig_churn, use_container_width=True)
 
    
 
@@ -4901,7 +4748,7 @@ with main_container:
 st.markdown("""
 <div style="text-align: center; margin-top: 5rem; font-size: 0.9rem; color: #666; font-weight: bold;">
     <em>*Customer Review Data will only be visible when either Language Translation/Reset Button is clicked</em><br>
-    <em>*SunBurst and TreeMap are displayed for data upto 3 months</em>
+    <em>*SunBurst and TreeMap are displayed for data upto 12 months</em>
 </div>
 """, unsafe_allow_html=True)
 
@@ -4925,4 +4772,3 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
-
