@@ -1,394 +1,118 @@
- /* Hide Streamlit header */
-
-    header {visibility: hidden;}
-
- 
-
-    /* Hide Streamlit footer */
-
-    footer {visibility: hidden;}
-
- 
-
-    /* Hide Main Menu */
-
-    #MainMenu {visibility: hidden;}
-
- 
-
-    .stApp {
-
-        background-color: #F5F5F5;
-
-        color: black;
-
-    }
-
- 
-
-    html, body, [class*="css"] {
-
-        font-family: 'PP Right Grotesk', sans-serif;
-
-    }
-
-   
-
-    /* Headers */
-
-    h1, h2, h3, h4, h5, h6 {
-
-        color: black;
-
-        font-weight: bold;
-
-    }
-
- 
-
-    /* Buttons */
-
-    div.stButton > button {
-
-        background-color: #ffdd00;
-
-        color: black !important;
-
-        /* border: black; */
-
-        border: 2px solid black !important;
-
-        padding: 0.2em 1em;
-
-        border-radius: 1px;
-
-    }
-
- 
-
-    /* Sidebar background and text */
-
-    section[data-testid="stSidebar"] {
-
-        background-color: #ffdd00;
-
-    }
-
- 
-
-    section[data-testid="stSidebar"] * {
-
-        color:  black !important;
-
-    }
-
- 
-
-    /* Sidebar background and text */
-
-    section[data-testid="stSidebar"] {
-
-        background-color: #ffdd00;
-
-        color: black !important;
-
-        border-right: 1px solid black; /* Vertical separator */
-
-    }    
-
- 
-
-   
-
-    /* DataFrame styling */
-
-    .stDataFrame {
-
-        background-color: white;
-
-        border: 1px solid black;
-
-        border-radius: 5px;
-
-        padding: 8px;
-
-    }
-
- 
-
-    .stDataFrame table {
-
-        color: black;
-
-        font-weight: 500;
-
-    }
-
-    div[data-baseweb="input"] input{
-
-    background-color:rgb(255, 255, 255);
-
-    }
-
- 
-
-    .stDateInput:nth-of-type(1) div[data-baseweb="input"] {
-
-        background-color:rgb(254, 254, 254);  
-
-        border:  2px solid #ffdd00;  
-
-    }
-
- 
-
-    .stTextInput div[data-baseweb="input"] {
-
-        background-color: rgb(255, 255, 255); ;   /* light blue */
-
-        border: 2px solid #ffdd00;
-
-            }
-
- 
-
-    .stDataFrame thead {
-
-        background-color: black;
-
-        color: #FFFF00;
-
-    }
-
- 
-
-    .stVerticalBlock{
-
-      display: block;
-
-    }
-
- 
-
-    .stWidgetLabel{
-
-    background-color: #ffdd00;
-
-    }
-
- 
-
-    /* Style for download button */
-
-    .stDownloadButton button {
-
-        /* background-color: #ffdd00;
-
-        color: black;
-
-        border: none;
-
-        padding: 0.5em 1em;
-
-        font-weight: bold;
-
-        border-radius: 5px;
-
-        cursor: pointer; */
-
-        background-color: #ffdd00;
-
-        color: black !important;
-
-        /* border: black; */
-
-        border: 2px solid black !important;
-
-        padding: 0.5em 1em;
-
-        border-radius: 1px;
-
-    }
-
- 
-
-    .stDownloadButton button:hover {
-
-        /* background-color: #333333; */
-
-        color: #FFFF00;
-
-    }
-
-    .st -dz{
-
-    border: 2px solid "#ffdd00";
-
- 
-
-    }
-
- 
-
-    /* Disable hover color change for expanders */
-
-    .streamlit-expanderHeader:hover {
-
-        color: inherit !important;
-
-    }
-
- 
-
-    /* Optional: Disable hover color change for all markdown text */
-
-    .markdown-text-container:hover {
-
-        color: inherit !important;
-
-    }
-
- 
-
-    /* Optional: Disable hover effect for all text */
-
-    *:hover {
-
-        color: inherit !important;
-
-    }
-
-        #MainMenu {visibility: hidden;}
-
-        .stDeployButton {display:none;}
-
-        footer {visibility: hidden;}
-
-        #stDecoration {display:none;}
-
-
-
-
-        [data-testid="stVerticalBlock"] {
-
-            display: inline;
-
-            gap: 1rem;
-
-        }
-
- 
-
-        [data-testid="stSidebarUserContent"] {
-
-            position: relative;
-
-            padding : 2rem;
-
-            gap: 1rem;
-
-        }
-
- 
-
-       /* Sidebar image tweaks */
-
-.no-fullscreen-sidebar img {
-
-    pointer-events: none;
-
-    user-select: none;
-
+/* ========================================
+   CRITICAL: ZERO TOP SPACING (TOP PRIORITY)
+   ======================================== */
+* { box-sizing: border-box !important; }
+div.block-container { 
+    padding-top: 0 !important; 
+    margin-top: 0 !important; 
+    padding-bottom: 0.5rem !important; 
+}
+section[data-testid="stAppViewContainer"] { 
+    padding-top: 0rem !important; 
+    margin-top: 0 !important;
+}
+.element-container { padding-top: 0 !important; margin-top: 0 !important; }
+.st-emotion-cache-1i9nah6 { margin-top: 0 !important; } /* Title container */
+
+/* Hide Streamlit junk */
+header, footer, #MainMenu, .stDeployButton, #stDecoration { display: none !important; }
+
+/* App base */
+.stApp { 
+    background-color: #FAFAFA !important; 
+    color: #1A1A1A !important;
+    padding-top: 0 !important;
 }
 
- 
-
-[title="View fullscreen"] {
-
-    display: none !important;
-
+/* Fonts */
+html, body, [class*="css"] { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
- 
-
-.no-fullscreen-sidebar {
-
-    text-align: center;
-
+/* Headers - Compact */
+h1, h2, h3, h4, h5, h6 { 
+    color: #000000 !important; 
+    font-weight: 700 !important;
+    margin-top: 0.25rem !important; /* Tight title spacing */
+    margin-bottom: 0.5rem !important;
 }
 
- 
-
-.no-fullscreen-sidebar img {
-
-    width: 100%;
-
-    margin-top: 10px;
-
-    margin-bottom: 20px;
-
+/* Buttons - Redcare peach */
+div.stButton > button, .stDownloadButton button {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%) !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FF6B35 !important;
+    padding: 0.4em 1.2em !important; /* Slightly smaller */
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(255,107,53,0.3) !important;
+    margin: 0.25rem 0 !important; /* Tight button spacing */
+}
+div.stButton > button:hover { 
+    background: linear-gradient(135deg, #FFA726 0%, #FF6B35 100%) !important;
+    transform: translateY(-1px) !important;
 }
 
- 
+/* Sidebar */
+section[data-testid="stSidebar"] { 
+    background: linear-gradient(180deg, #FF6B35 0%, #FFA726 100%) !important;
+    border-right: 3px solid #000000 !important;
+    padding-top: 0.5rem !important; /* Compact sidebar top */
+}
+section[data-testid="stSidebar"] * { color: #000000 !important; }
 
-.custom-header {
-
-    text-align: center;
-
-    padding-top: 25px;
-
+/* DataFrames compact */
+.stDataFrame { 
+    background: #FFFFFF !important; 
+    border: 2px solid #E0E0E0 !important; 
+    border-radius: 8px !important; 
+    padding: 4px !important; /* Smaller padding */
 }
 
- 
+/* Inputs */
+div[data-baseweb="input"] input, .stTextInput div[data-baseweb="input"], .stDateInput div[data-baseweb="input"] {
+    background: #FFFFFF !important; 
+    border: 2px solid #FF6B35 !important; 
+    border-radius: 8px !important;
+}
 
+/* Labels compact */
+.stWidgetLabel { 
+    background: linear-gradient(90deg, #FF6B35, #FFA726) !important; 
+    color: #000000 !important; 
+    border-radius: 6px !important; 
+    padding: 2px 6px !important; /* Smaller */
+    margin-bottom: 0.25rem !important;
+}
+
+/* Columns tight */
+.stHorizontalBlock > div { display: flex !important; gap: 0.5rem !important; }
+
+/* Sidebar content tight */
+[data-testid="stSidebarUserContent"] { padding: 0.75rem !important; gap: 0.5rem !important; }
+
+/* Sidebar image compact */
+.no-fullscreen-sidebar img { 
+    width: 100% !important; 
+    max-width: 180px !important; /* Smaller */
+    margin: 5px 0 10px 0 !important; /* Tighter margins */
+}
+
+/* Metric cards */
+.metric-card, .timed-warning-box {
+    border-radius: 8px !important; 
+    margin: 0.25rem 0 !important; /* Tight spacing */
+}
+
+/* Title gradient text fix */
 .custom-header h1 {
-
-    color: black;
-
-    font-weight: bold;
-
-    font-family: "PP Right Grotesk", sans-serif;
-
-    font-size: 45px;
-
+    background: linear-gradient(135deg, #FF6B35 0%, #FFA726 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-size: 2.2rem !important; /* Smaller title */
+    margin-top: 0.25rem !important;
 }
 
-
-
-
-.timed-warning-box {
-
-    margin-top: 5px;
-
-    text-align: center;
-
-    padding: 10px;
-
-    background-color: #f8d7da;
-
-    border: 1px solid #f5c6cb;
-
-    border-radius: 4px;
-
-}
-
- 
-
-.timed-warning-box strong {
-
-    color: black;
-
-    font-size: 15px;
-
-}
-
- 
-
-.stDataFrame {
-
-    border-radius: 10px;
-
-    overflow: hidden;
-
-}
-
+/* NO HOVER DISTRACTIONS */
+*:hover { color: inherit !important; }
